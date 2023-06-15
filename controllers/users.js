@@ -51,7 +51,7 @@ const updateAvatar = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      return res.send(user);
+      return res.status(201).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
