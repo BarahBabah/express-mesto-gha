@@ -44,7 +44,7 @@ const deleteCard = (req, res) => {
         message: 'Internal Server Error',
         err: err.message,
         stack: err.stack,
-      }
+      },
 
     ));
 };
