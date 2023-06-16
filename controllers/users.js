@@ -6,6 +6,10 @@ const getUserById = (req, res) => {
     .then((user) => {
       res.status(200).send(user);
     }).catch((err) => {
+      if (err.name === ('CastError' || 'ValidationError')) {
+        res.status(400).send({ message: `Некорректный id' ${req.params.user_id}` });
+        return;
+      }
       if (err.message === 'NotFoundId') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
@@ -36,11 +40,15 @@ const createUsers = (req, res) => {
     res.status(201).send(user);
   })
     .catch((err) => {
-      res.status(500).send({
-        message: 'На сервере произошла ошибка',
-        err: err.message,
-        stack: err.stack,
-      });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректные данные при создании пользователя' });
+      } else {
+        res.status(500).send({
+          message: 'На сервере произошла ошибка',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
     });
 };
 
