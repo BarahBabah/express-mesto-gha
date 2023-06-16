@@ -2,7 +2,10 @@ const userModel = require('../models/user');
 
 const getUserById = (req, res) => {
   userModel.findById(req.params.user_id).then((user) => {
-    res.status(200).send(user);
+    if (!user) {
+      return res.status(404).send({ message: 'Пользователь не найден' });
+    }
+    return res.status(200).send(user);
   }).catch((err) => {
     res.status(500).send({
       message: 'На сервере произошла ошибка',
