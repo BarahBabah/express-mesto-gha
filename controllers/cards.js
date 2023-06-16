@@ -6,11 +6,9 @@ const getCards = (req, res) => {
     .then((cards) => {
       res.send(cards);
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(STATUS_CODES.SERVER_ERROR).send({
         message: 'На сервере произошла ошибка',
-        err: err.message,
-        stack: err.stack,
       });
     });
 };
@@ -27,14 +25,10 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(STATUS_CODES.BAD_REQUEST).send({
           message: 'Переданы некорректные данные при создании карточки',
-          err: err.message,
-          stack: err.stack,
         });
       } else {
         res.status(STATUS_CODES.SERVER_ERROR).send({
           message: 'На сервере произошла ошибка',
-          err: err.message,
-          stack: err.stack,
         });
       }
     });
@@ -45,8 +39,7 @@ const deleteCard = (req, res) => {
     .orFail(new Error('NotFound'))
     .then((card) => res.status(STATUS_CODES.OK).send({ message: `Карточка удалена: ${card._id}` }))
     .catch((err) => {
-      console.log(err.name);
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(STATUS_CODES.BAD_REQUEST).send({ message: 'Некорректный id карточки' });
         return;
       }
@@ -55,8 +48,6 @@ const deleteCard = (req, res) => {
       } else {
         res.status(STATUS_CODES.SERVER_ERROR).send({
           message: 'На сервере произошла ошибка',
-          err: err.message,
-          stack: err.stack,
         });
       }
     });
@@ -77,14 +68,10 @@ const likeCard = (req, res) => {
       } else if (err.message === ('NotFound')) {
         res.status(STATUS_CODES.NOT_FOUND).send({
           message: 'Пользователь не найден',
-          err: err.message,
-          stack: err.stack,
         });
       } else {
         res.status(STATUS_CODES.SERVER_ERROR).send({
           message: 'На сервере произошла ошибка',
-          err: err.message,
-          stack: err.stack,
         });
       }
     });
@@ -98,20 +85,15 @@ const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
   .then((card) => {
     res.status(STATUS_CODES.OK).send(card.likes);
   }).catch((err) => {
-    console.log(err.name);
     if (err.name === 'CastError') {
       res.status(STATUS_CODES.BAD_REQUEST).send({ message: 'Передан несуществующий _id карточки' });
     } else if (err.message === ('NotFound')) {
       res.status(STATUS_CODES.NOT_FOUND).send({
         message: 'Пользователь не найден',
-        err: err.message,
-        stack: err.stack,
       });
     } else {
       res.status(STATUS_CODES.SERVER_ERROR).send({
         message: 'На сервере произошла ошибка',
-        err: err.message,
-        stack: err.stack,
       });
     }
   });
