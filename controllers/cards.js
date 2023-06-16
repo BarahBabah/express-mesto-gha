@@ -41,20 +41,23 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   cardModel.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
+    .orFail(new Error('NotFound'))
+    .then((card) => res.status(200).send({ message: `Карточка удалена: ${card._id}` }))
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректный id карточки' });
+        return;
       }
-      return res.status(200).send({ message: 'Карточка удалена' });
-    })
-    .catch((err) => res.status(500).send(
-      {
-        message: 'На сервере произошла ошибка',
-        err: err.message,
-        stack: err.stack,
-      },
-
-    ));
+      if (err.message === 'NotFoundId') {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      } else {
+        res.status(500).send({
+          message: 'На сервере произошла ошибка',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
+    });
 };
 
 const likeCard = (req, res) => {
@@ -66,7 +69,7 @@ const likeCard = (req, res) => {
     res.status(201).send(card.likes);
   }).catch((err) => {
     if (err.name === 'CastError' || err.name === 'TypeError') {
-      res.status(400).send({ message: 'Передан несуществующий _id карточки' });
+      res.status(404).send({ message: 'Передан несуществующий _id карточки' });
     } else if (err.name === ('DocumentNotFoundError')) {
       res.status(404).send({
         message: 'Пользователь не найден',
@@ -91,7 +94,7 @@ const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
   res.status(200).send(card.likes);
 }).catch((err) => {
   if (err.name === 'CastError' || err.name === 'TypeError') {
-    res.status(400).send({ message: 'Передан несуществующий _id карточки' });
+    res.status(404).send({ message: 'Передан несуществующий _id карточки' });
   } else if (err.name === ('DocumentNotFoundError')) {
     res.status(404).send({
       message: 'Пользователь не найден',
