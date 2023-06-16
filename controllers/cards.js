@@ -65,7 +65,7 @@ const likeCard = (req, res) => {
   ).then((card) => {
     res.status(201).send(card.likes);
   }).catch((err) => {
-    if (err.name === ('CastError')) {
+    if (err.name === 'CastError' || err.name === 'TypeError') {
       res.status(400).send({ message: 'Передан несуществующий _id карточки' });
     } else if (err.name === ('DocumentNotFoundError')) {
       res.status(404).send({
@@ -90,7 +90,7 @@ const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
 ).then((card) => {
   res.status(200).send(card.likes);
 }).catch((err) => {
-  if (err.name === ('CastError')) {
+  if (err.name === 'CastError' || err.name === 'TypeError') {
     res.status(400).send({ message: 'Передан несуществующий _id карточки' });
   } else if (err.name === ('DocumentNotFoundError')) {
     res.status(404).send({

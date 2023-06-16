@@ -6,7 +6,7 @@ const getUserById = (req, res) => {
     .then((user) => {
       res.status(200).send(user);
     }).catch((err) => {
-      if (err.name === ('CastError' || 'ValidationError')) {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(400).send({ message: `Некорректный id' ${req.params.user_id}` });
         return;
       }
