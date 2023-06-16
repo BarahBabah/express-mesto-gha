@@ -63,10 +63,23 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
-    if (!card) {
-      return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+    res.status(201).send(card.likes);
+  }).catch((err) => {
+    if (err.name === ('CastError')) {
+      res.status(400).send({ message: 'Передан несуществующий _id карточки' });
+    } else if (err.name === ('DocumentNotFoundError')) {
+      res.status(404).send({
+        message: 'Пользователь не найден',
+        err: err.message,
+        stack: err.stack,
+      });
+    } else {
+      res.status(500).send({
+        message: 'На сервере произошла ошибка',
+        err: err.message,
+        stack: err.stack,
+      });
     }
-    return res.status(201).send(card.likes);
   });
 };
 
@@ -75,18 +88,24 @@ const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
   { $pull: { likes: req.user._id } }, // убрать _id из массива
   { new: true },
 ).then((card) => {
-  if (!card) {
-    return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+  res.status(200).send(card.likes);
+}).catch((err) => {
+  if (err.name === ('CastError')) {
+    res.status(400).send({ message: 'Передан несуществующий _id карточки' });
+  } else if (err.name === ('DocumentNotFoundError')) {
+    res.status(404).send({
+      message: 'Пользователь не найден',
+      err: err.message,
+      stack: err.stack,
+    });
+  } else {
+    res.status(500).send({
+      message: 'На сервере произошла ошибка',
+      err: err.message,
+      stack: err.stack,
+    });
   }
-  return res.status(200).send(card.likes);
-}).catch((err) => res.status(500).send(
-  {
-    message: 'На сервере произошла ошибка',
-    err: err.message,
-    stack: err.stack,
-  },
-
-));
+});
 
 module.exports = {
   getCards,
