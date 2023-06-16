@@ -1,18 +1,21 @@
 const userModel = require('../models/user');
 
 const getUserById = (req, res) => {
-  userModel.findById(req.params.user_id).then((user) => {
-    if (!user) {
-      return res.status(404).send({ message: 'Пользователь не найден' });
-    }
-    return res.status(200).send(user);
-  }).catch((err) => {
-    res.status(500).send({
-      message: 'На сервере произошла ошибка',
-      err: err.message,
-      stack: err.stack,
+  userModel.findById(req.params.user_id)
+    .orFail(new Error('NotFoundId'))
+    .then((user) => {
+      res.status(200).send(user);
+    }).catch((err) => {
+      if (err.message === 'NotFoundId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(500).send({
+          message: 'На сервере произошла ошибка',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
     });
-  });
 };
 
 const getUsers = (req, res) => {
