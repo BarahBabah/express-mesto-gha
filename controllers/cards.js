@@ -7,7 +7,7 @@ const getCards = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: 'Internal Server Error',
+        message: 'На сервере произошла ошибка',
         err: err.message,
         stack: err.stack,
       });
@@ -23,11 +23,19 @@ const createCard = (req, res) => {
       res.status(201).send(card);
     })
     .catch((err) => {
-      res.status(500).send({
-        message: 'Internal Server Error',
-        err: err.message,
-        stack: err.stack,
-      });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные при создании карточки',
+          err: err.message,
+          stack: err.stack,
+        });
+      } else {
+        res.status(500).send({
+          message: 'На сервере произошла ошибка',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
     });
 };
 
@@ -37,11 +45,11 @@ const deleteCard = (req, res) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.send(card);
+      return res.status(200).send({ message: 'Карточка удалена' });
     })
     .catch((err) => res.status(500).send(
       {
-        message: 'Internal Server Error',
+        message: 'На сервере произошла ошибка',
         err: err.message,
         stack: err.stack,
       },
@@ -55,7 +63,10 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
-    res.send(card.likes);
+    if (!card) {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+    }
+    return res.status(201).send(card.likes);
   });
 };
 
@@ -64,8 +75,18 @@ const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
   { $pull: { likes: req.user._id } }, // убрать _id из массива
   { new: true },
 ).then((card) => {
-  res.send(card.likes);
-});
+  if (!card) {
+    return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+  }
+  return res.status(200).send(card.likes);
+}).catch((err) => res.status(500).send(
+  {
+    message: 'На сервере произошла ошибка',
+    err: err.message,
+    stack: err.stack,
+  },
+
+));
 
 module.exports = {
   getCards,
