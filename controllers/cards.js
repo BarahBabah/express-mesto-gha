@@ -66,12 +66,41 @@ const likeCard = (req, res) => {
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).then((card) => {
-    res.status(201).send(card.likes);
+  )
+    .orFail(new Error('NotFound'))
+    .then((card) => {
+      res.status(201).send(card.likes);
+    }).catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Передан несуществующий _id карточки' });
+      } else if (err.message === ('NotFound')) {
+        res.status(404).send({
+          message: 'Пользователь не найден',
+          err: err.message,
+          stack: err.stack,
+        });
+      } else {
+        res.status(500).send({
+          message: 'На сервере произошла ошибка',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
+    });
+};
+
+const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
+  req.params.cardId,
+  { $pull: { likes: req.user._id } }, // убрать _id из массива
+  { new: true },
+).orFail(new Error('NotFound'))
+  .then((card) => {
+    res.status(200).send(card.likes);
   }).catch((err) => {
-    if (err.name === 'CastError' || err.name === 'TypeError') {
+    console.log(err.name);
+    if (err.name === 'CastError') {
       res.status(400).send({ message: 'Передан несуществующий _id карточки' });
-    } else if (err.name === ('DocumentNotFoundError')) {
+    } else if (err.name === ('NotFound')) {
       res.status(404).send({
         message: 'Пользователь не найден',
         err: err.message,
@@ -85,31 +114,6 @@ const likeCard = (req, res) => {
       });
     }
   });
-};
-
-const dislikeCard = (req, res) => cardModel.findByIdAndUpdate(
-  req.params.cardId,
-  { $pull: { likes: req.user._id } }, // убрать _id из массива
-  { new: true },
-).then((card) => {
-  res.status(200).send(card.likes);
-}).catch((err) => {
-  if (err.name === 'CastError' || err.name === 'TypeError') {
-    res.status(400).send({ message: 'Передан несуществующий _id карточки' });
-  } else if (err.name === ('DocumentNotFoundError')) {
-    res.status(404).send({
-      message: 'Пользователь не найден',
-      err: err.message,
-      stack: err.stack,
-    });
-  } else {
-    res.status(500).send({
-      message: 'На сервере произошла ошибка',
-      err: err.message,
-      stack: err.stack,
-    });
-  }
-});
 
 module.exports = {
   getCards,
