@@ -5,7 +5,7 @@ const getUserById = (req, res) => {
     res.status(200).send(user);
   }).catch((err) => {
     res.status(500).send({
-      message: 'Internal Server Error',
+      message: 'На сервере произошла ошибка',
       err: err.message,
       stack: err.stack,
     });
@@ -18,7 +18,7 @@ const getUsers = (req, res) => {
   })
     .catch((err) => {
       res.status(500).send({
-        message: 'Internal Server Error',
+        message: 'На сервере произошла ошибка',
         err: err.message,
         stack: err.stack,
       });
@@ -31,7 +31,7 @@ const createUsers = (req, res) => {
   })
     .catch((err) => {
       res.status(500).send({
-        message: 'Internal Server Error',
+        message: 'На сервере произошла ошибка',
         err: err.message,
         stack: err.stack,
       });
@@ -51,7 +51,7 @@ const updateAvatar = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      return res.status(201).send(user);
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
