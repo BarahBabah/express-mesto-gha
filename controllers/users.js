@@ -8,7 +8,7 @@ const getUserById = (req, res) => {
     .then((user) => {
       res.status(STATUS_CODES.OK).send(user);
     }).catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(STATUS_CODES.BAD_REQUEST).send({ message: `Некорректный id' ${req.params.user_id}` });
         return;
       }
@@ -17,8 +17,6 @@ const getUserById = (req, res) => {
       } else {
         res.status(STATUS_CODES.SERVER_ERROR).send({
           message: 'На сервере произошла ошибка',
-          err: err.message,
-          stack: err.stack,
         });
       }
     });
@@ -28,11 +26,9 @@ const getUsers = (req, res) => {
   userModel.find({}).then((users) => {
     res.send(users);
   })
-    .catch((err) => {
+    .catch(() => {
       res.status(STATUS_CODES.SERVER_ERROR).send({
         message: 'На сервере произошла ошибка',
-        err: err.message,
-        stack: err.stack,
       });
     });
 };
@@ -47,8 +43,6 @@ const createUsers = (req, res) => {
       } else {
         res.status(STATUS_CODES.SERVER_ERROR).send({
           message: 'На сервере произошла ошибка',
-          err: err.message,
-          stack: err.stack,
         });
       }
     });
@@ -73,8 +67,6 @@ const updateAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(STATUS_CODES.BAD_REQUEST).send({
           message: 'Validation Error',
-          err: err.message,
-          stack: err.stack,
         });
       }
       return res.status(STATUS_CODES.SERVER_ERROR).send({ message: 'Ошибка на сервере' });
@@ -101,8 +93,6 @@ const updateUser = (req, res) => {
         return res.status(STATUS_CODES.BAD_REQUEST).send(
           {
             message: 'Validation Error',
-            err: err.message,
-            stack: err.stack,
           },
         );
       }
