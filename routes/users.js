@@ -5,7 +5,7 @@ router.get('/', usersConroller.getUsers);
 
 router.get('/:user_id', usersConroller.getUserById);
 
-router.post('/', usersConroller.createUsers);
+router.get('/me', usersConroller.getUserById);
 
 router.patch('/me', usersConroller.updateUser);
 

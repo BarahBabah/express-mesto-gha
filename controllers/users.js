@@ -1,15 +1,23 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
-
 const { STATUS_CODES } = require('../utils/constants');
 
 const getUserById = (req, res) => {
-  userModel.findById(req.params.user_id)
+  let action;
+
+  if (req.path === '/me') {
+    action = req.user._id;
+  } else {
+    action = req.params.id;
+  }
+  userModel.findById(action)
     .orFail(new Error('NotFoundId'))
     .then((user) => {
       res.status(STATUS_CODES.OK).send(user);
     }).catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_CODES.BAD_REQUEST).send({ message: `Некорректный id' ${req.params.user_id}` });
+        res.status(STATUS_CODES.BAD_REQUEST).send({ message: `Некорректный id' ${action}` });
         return;
       }
       if (err.message === 'NotFoundId') {
@@ -34,18 +42,39 @@ const getUsers = (req, res) => {
 };
 
 const createUsers = (req, res) => {
-  userModel.create(req.body).then((user) => {
-    res.status(STATUS_CODES.CREATED).send(user);
-  })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(STATUS_CODES.BAD_REQUEST).send({ message: 'Некорректные данные при создании пользователя' });
-      } else {
-        res.status(STATUS_CODES.SERVER_ERROR).send({
-          message: 'На сервере произошла ошибка',
-        });
-      }
-    });
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10).then((hash) => {
+    userModel.create({
+      name, about, email, avatar, password: hash,
+    })
+      .then((user) => {
+        res.status(STATUS_CODES.CREATED).send(user);
+      })
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          res.status(STATUS_CODES.BAD_REQUEST)
+            .send({ message: 'Некорректные данные при создании пользователя' });
+        } else {
+          res.status(STATUS_CODES.SERVER_ERROR)
+            .send({
+              message: 'На сервере произошла ошибка',
+            });
+        }
+      });
+  });
+};
+
+const login = (req, res,next) => {
+  const { password, email } = req.body;
+  return userModel.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+        expiresIn: '7d',
+      });
+      res.send({ token });
+    }).catch(next);
 };
 
 const updateAvatar = (req, res) => {
@@ -106,4 +135,5 @@ module.exports = {
   createUsers,
   updateUser,
   updateAvatar,
+  login,
 };
