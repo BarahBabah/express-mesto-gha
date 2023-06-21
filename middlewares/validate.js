@@ -1,5 +1,6 @@
 const { Joi, celebrate } = require('celebrate');
 
+// eslint-disable-next-line no-useless-escape
 const patternUrl = /http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/;
 
 const validateCard = celebrate({

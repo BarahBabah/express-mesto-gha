@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
 const { STATUS_CODES } = require('../utils/constants');
-const { BadRequestError } = require('../utils/errors');
+const { BadRequestError, ConflictUserError } = require('../utils/errors');
 
 const getUserById = (req, res) => {
   let action;
@@ -42,7 +42,7 @@ const getUsers = (req, res) => {
     });
 };
 
-const createUsers = (req, res) => {
+const createUsers = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -51,14 +51,15 @@ const createUsers = (req, res) => {
     userModel.create({
       name, about, email, avatar, password: hash,
     })
-      .then((user) => {
+      .then(() => {
         res.status(STATUS_CODES.CREATED).send({
           name, about, email, avatar,
         });
       })
+      // eslint-disable-next-line consistent-return
       .catch((err) => {
-         if (err.name === 'MongoServerError') {
-          return next(new ErrConflictUser('Пользователь с таким email уже существует'));
+        if (err.name === 'MongoServerError') {
+          return next(new ConflictUserError('Пользователь с таким email уже существует'));
         }
         if (err.name === 'ValidationError') {
           res.status(STATUS_CODES.BAD_REQUEST)
