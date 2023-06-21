@@ -2,7 +2,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
-const { DUBLICATE_KEY_ERROR, CREATED, OK } = require('../utils/constants');
+const { DUPLICATE_KEY_ERROR, CREATED, OK } = require('../utils/constants');
 const { BadRequestError, ConflictUserError, NotFoundError } = require('../utils/errors');
 const { SECRET_KEY, JWT_EXPIRES } = require('../utils/config');
 
@@ -47,7 +47,7 @@ const createUsers = (req, res, next) => {
         });
       })
       .catch((err) => {
-        if (err.name === DUBLICATE_KEY_ERROR) {
+        if (err.code === DUPLICATE_KEY_ERROR) {
           return next(new ConflictUserError('Пользователь с таким email уже существует'));
         }
         if (err.name === 'ValidationError') {
