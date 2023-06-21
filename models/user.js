@@ -7,22 +7,18 @@ const userSchema = new mongoose.Schema({
   name: {
     default: 'Жак-Ив Кусто',
     type: String,
-    // required: true,
     minlength: 2,
     maxlength: 30,
   },
   about: {
     default: 'Исследователь',
     type: String,
-    // required: true,
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     type: String,
-    // required: true,
-    unique: true,
     validate: (value) => validator.isURL(value),
     message: 'Пожалуйста, предоставьте ссылку на изображение в формате URL.',
   },
@@ -46,7 +42,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       if (!user) {
         return Promise.reject(new NotAuthorizedError('Неправильные почта или пароль'));
       }
-
+      console.log(password, user.password);
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
