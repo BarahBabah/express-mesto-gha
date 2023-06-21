@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { errors } = require('celebrate');
 const { STATUS_CODES } = require('../utils/constants');
 const usersRouter = require('./users');
 const cardsRouter = require('./cards');
@@ -18,7 +19,7 @@ router.use('/*', (req, res) => {
     message: 'Страница не найдена',
   });
 });
-
+router.use(errors());
 router.use((err, req, res, next) => {
   const { statusCode = STATUS_CODES.SERVER_ERROR, message } = err;
   res.status(statusCode).send({
