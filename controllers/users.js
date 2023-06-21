@@ -2,8 +2,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
-const { STATUS_CODES } = require('../utils/constants');
+const { DUBLICATE_KEY_ERROR, CREATED, OK } = require('../utils/constants');
 const { BadRequestError, ConflictUserError, NotFoundError } = require('../utils/errors');
+const { SECRET_KEY, JWT_EXPIRES } = require('../utils/config');
 
 const getUserById = (req, res, next) => {
   let action;
@@ -16,7 +17,7 @@ const getUserById = (req, res, next) => {
   userModel.findById(action)
     .orFail(() => { throw new NotFoundError('Пользователь не найден'); })
     .then((user) => {
-      res.status(STATUS_CODES.OK).send(user);
+      res.status(OK).send(user);
     }).catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError(`Некорректный id' ${action}`));
@@ -36,18 +37,17 @@ const createUsers = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!password) throw new BadRequestError('Ошибка');
   bcrypt.hash(password, 10).then((hash) => {
     userModel.create({
       name, about, email, avatar, password: hash,
     })
       .then(() => {
-        res.status(STATUS_CODES.CREATED).send({
+        res.status(CREATED).send({
           name, about, email, avatar,
         });
       })
       .catch((err) => {
-        if (err.name === 'MongoServerError') {
+        if (err.name === DUBLICATE_KEY_ERROR) {
           return next(new ConflictUserError('Пользователь с таким email уже существует'));
         }
         if (err.name === 'ValidationError') {
@@ -62,8 +62,8 @@ const login = (req, res, next) => {
   const { password, email } = req.body;
   return userModel.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
-        expiresIn: '7d',
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
+        expiresIn: JWT_EXPIRES,
       });
       res.send({ token });
     }).catch(next);
@@ -82,7 +82,7 @@ const updateAvatar = (req, res, next) => {
   })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') next(new BadRequestError('Переданы некорректные данные'));
+      if (err.name === 'ValidationError') next(new BadRequestError('Переданы некорректные данные'));
       else next(err);
       next(err);
     });
@@ -101,7 +101,7 @@ const updateUser = (req, res, next) => {
   })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);

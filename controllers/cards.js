@@ -1,5 +1,5 @@
 const cardModel = require('../models/card');
-const { STATUS_CODES } = require('../utils/constants');
+const { CREATED, OK } = require('../utils/constants');
 const { NotFoundError, ForbiddenError, BadRequestError } = require('../utils/errors');
 
 const getCards = (req, res, next) => {
@@ -16,7 +16,7 @@ const createCard = (req, res, next) => {
     ...req.body,
   })
     .then((card) => {
-      res.status(STATUS_CODES.CREATED).send(card);
+      res.status(CREATED).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -60,7 +60,7 @@ const likeCard = (req, res, next) => {
   )
     .orFail(() => { throw new NotFoundError('Пользователь не найден'); })
     .then((card) => {
-      res.status(STATUS_CODES.CREATED).send(card.likes);
+      res.status(CREATED).send(card.likes);
     }).catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Передан несуществующий _id карточки'));
@@ -75,7 +75,7 @@ const dislikeCard = (req, res, next) => cardModel.findByIdAndUpdate(
   { new: true },
 ).orFail(() => { throw new NotFoundError('Пользователь не найден'); })
   .then((card) => {
-    res.status(STATUS_CODES.OK).send(card.likes);
+    res.status(OK).send(card.likes);
   }).catch((err) => {
     if (err.name === 'CastError') {
       return next(new BadRequestError('Передан несуществующий _id карточки'));

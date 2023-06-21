@@ -1,37 +1,39 @@
 /* eslint-disable max-classes-per-file */
-const { STATUS_CODES } = require('./constants');
+const {
+  NOT_FOUND, BAD_REQUEST, NOT_AUTHORIZED, FORBIDDEN, CONFLICT,
+} = require('./constants');
 
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = STATUS_CODES.NOT_FOUND;
+    this.statusCode = NOT_FOUND;
   }
 }
 
 class BadRequestError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = STATUS_CODES.BAD_REQUEST;
+    this.statusCode = BAD_REQUEST;
   }
 }
 
 class NotAuthorizedError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = STATUS_CODES.NOT_AUTHORIZED;
+    this.statusCode = NOT_AUTHORIZED;
   }
 }
 
 class ForbiddenError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = STATUS_CODES.FORBIDDEN;
+    this.statusCode = FORBIDDEN;
   }
 }
 class ConflictUserError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = STATUS_CODES.CONFLICT;
+    this.statusCode = CONFLICT;
   }
 }
 

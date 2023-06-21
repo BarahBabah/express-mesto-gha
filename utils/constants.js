@@ -7,6 +7,10 @@ const STATUS_CODES = {
   CONFLICT: 409,
   FORBIDDEN: 403,
   NOT_AUTHORIZED: 401,
+  DUBLICATE_KEY_ERROR: 11000,
 };
 
-module.exports = { STATUS_CODES };
+// eslint-disable-next-line no-useless-escape
+const patternUrl = /http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/;
+
+module.exports = { STATUS_CODES, patternUrl };

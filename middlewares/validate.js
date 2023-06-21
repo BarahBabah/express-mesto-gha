@@ -1,7 +1,6 @@
 const { Joi, celebrate } = require('celebrate');
-
+const { patternUrl } = require('../utils/constants');
 // eslint-disable-next-line no-useless-escape
-const patternUrl = /http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/;
 
 const validateCard = celebrate({
   body: Joi.object().keys({
@@ -12,7 +11,7 @@ const validateCard = celebrate({
 
 const validateCardId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
+    cardId: Joi.string().required().hex().length(24),
   }),
 });
 
@@ -28,8 +27,8 @@ const validateCreateUser = celebrate({
 
 const validateUserInfo = celebrate({
   body: Joi.object().keys({
-    about: Joi.string().min(2).max(30),
-    name: Joi.string().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
   }),
 });
 
@@ -41,7 +40,7 @@ const validateUserId = celebrate({
 
 const validateAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(patternUrl),
+    avatar: Joi.string().required().pattern(patternUrl),
   }),
 });
 const validateLogin = celebrate({
