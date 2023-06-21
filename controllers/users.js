@@ -2,16 +2,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
 const { STATUS_CODES } = require('../utils/constants');
-const { BadRequestError, ConflictUserError } = require('../utils/errors');
+const { BadRequestError } = require('../utils/errors');
 
 const getUserById = (req, res) => {
   let action;
 
   if (req.path === '/me') {
-    console.log(req.user);
     action = req.user._id;
   } else {
-    action = req.params.id;
+    action = req.params.user_id;
   }
   userModel.findById(action)
     .orFail(new Error('NotFoundId'))
@@ -43,7 +42,7 @@ const getUsers = (req, res) => {
     });
 };
 
-const createUsers = (req, res, next) => {
+const createUsers = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -52,15 +51,14 @@ const createUsers = (req, res, next) => {
     userModel.create({
       name, about, email, avatar, password: hash,
     })
-      .then(() => {
+      .then((user) => {
         res.status(STATUS_CODES.CREATED).send({
           name, about, email, avatar,
         });
       })
-      // eslint-disable-next-line consistent-return
       .catch((err) => {
-        if (err.name === 'MongoServerError') {
-          return next(new ConflictUserError('Пользователь с таким email уже существует'));
+         if (err.name === 'MongoServerError') {
+          return next(new ErrConflictUser('Пользователь с таким email уже существует'));
         }
         if (err.name === 'ValidationError') {
           res.status(STATUS_CODES.BAD_REQUEST)

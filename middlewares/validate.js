@@ -1,6 +1,6 @@
 const { Joi, celebrate } = require('celebrate');
 
-const patternUrl = /http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/
+const patternUrl = /http(s)?:\/\/(www.)?[a-z0-9\.\-]+\/[a-z0-9\.\-_~:\/?#\[\]@!$&'()*+,;=]+/;
 
 const validateCard = celebrate({
   body: Joi.object().keys({
