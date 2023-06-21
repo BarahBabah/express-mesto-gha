@@ -6,6 +6,7 @@ const cardsRouter = require('./cards');
 const { login, createUsers } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const { validateCreateUser, validateLogin } = require('../middlewares/validate');
+const { NotFoundError } = require('../utils/errors');
 
 router.post('/signin', validateLogin, login);
 router.post('/signup', validateCreateUser, createUsers);
@@ -14,10 +15,8 @@ router.use(auth);
 
 router.use('/users', usersRouter);
 router.use('/cards', cardsRouter);
-router.use('/*', (req, res) => {
-  res.status(STATUS_CODES.NOT_FOUND).send({
-    message: 'Страница не найдена',
-  });
+router.use('/*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 router.use(errors());
 router.use((err, req, res, next) => {
