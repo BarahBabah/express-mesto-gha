@@ -4,9 +4,10 @@ const { validateUserId, validateUserInfo, validateAvatar } = require('../middlew
 
 router.get('/', usersConroller.getUsers);
 
+router.get('/me', usersConroller.getUserById);
+
 router.get('/:user_id', validateUserId, usersConroller.getUserById);
 
-router.get('/me', usersConroller.getUserById);
 
 router.patch('/me', validateUserInfo, usersConroller.updateUser);
 
