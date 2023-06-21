@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
 const { STATUS_CODES } = require('../utils/constants');
+const { BadRequestError } = require('../utils/errors');
 
 const getUserById = (req, res) => {
   let action;
@@ -45,6 +46,7 @@ const createUsers = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+  if (!password) throw new BadRequestError('Ошибка');
   bcrypt.hash(password, 10).then((hash) => {
     userModel.create({
       name, about, email, avatar, password: hash,
