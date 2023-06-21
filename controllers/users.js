@@ -66,7 +66,7 @@ const createUsers = (req, res) => {
   });
 };
 
-const login = (req, res,next) => {
+const login = (req, res, next) => {
   const { password, email } = req.body;
   return userModel.findUserByCredentials(email, password)
     .then((user) => {

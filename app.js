@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { login, createUsers } = require('./controllers/users');
 const router = require('./routes');
-const auth = require('./middlewares/auth')
+const auth = require('./middlewares/auth');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
