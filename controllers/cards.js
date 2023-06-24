@@ -75,7 +75,7 @@ const dislikeCard = (req, res, next) => cardModel.findByIdAndUpdate(
   { new: true },
 ).orFail(() => { throw new NotFoundError('Пользователь не найден'); })
   .then((card) => {
-    res.status(OK).send(card.likes);
+    res.status(OK).send(card);
   }).catch((err) => {
     if (err.name === 'CastError') {
       return next(new BadRequestError('Передан несуществующий _id карточки'));
