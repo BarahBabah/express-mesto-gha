@@ -12,6 +12,6 @@ mongoose.connect(MONGO_URL);
 
 mongoose.set({ runValidators: true });
 app.use(express.json());
-app.use(router);
+app.use('/api', router);
 app.listen(PORT, () => {
 });
