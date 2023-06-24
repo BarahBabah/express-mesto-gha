@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     maxlength: 30,
   },
   avatar: {
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    default: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif',
     type: String,
     validate: (value) => validator.isURL(value),
     message: 'Пожалуйста, предоставьте ссылку на изображение в формате URL.',
