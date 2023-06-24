@@ -60,7 +60,7 @@ const likeCard = (req, res, next) => {
   )
     .orFail(() => { throw new NotFoundError('Пользователь не найден'); })
     .then((card) => {
-      res.status(CREATED).send(card.likes);
+      res.status(CREATED).send(card);
     }).catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Передан несуществующий _id карточки'));
