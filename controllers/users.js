@@ -41,16 +41,16 @@ const createUsers = (req, res, next) => {
     userModel.create({
       name, about, email, avatar, password: hash,
     })
-      .then(() => {
-        res.status(CREATED).send({
+      .then(() => res.status(CREATED).send(
+        {
           data: {
             name,
             about,
             avatar,
             email,
           },
-        });
-      })
+        },
+      ))
       .catch((err) => {
         if (err.code === DUPLICATE_KEY_ERROR) {
           return next(new ConflictUserError('Пользователь с таким email уже существует'));
