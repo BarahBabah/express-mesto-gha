@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
-const { NotAuthorizedError } = require('../utils/errors');
+const NotAuthorizedError = require('../utils/errors/NotAuthorizedError');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     maxlength: 30,
   },
   avatar: {
-    default: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     type: String,
     validate: (value) => validator.isURL(value),
     message: 'Пожалуйста, предоставьте ссылку на изображение в формате URL.',

@@ -3,8 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
 const { DUPLICATE_KEY_ERROR, CREATED, OK } = require('../utils/constants');
-const { BadRequestError, ConflictUserError, NotFoundError } = require('../utils/errors');
 const { SECRET_KEY, JWT_EXPIRES } = require('../utils/config');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const ConflictUserError = require('../utils/errors/ConflictUserError');
+const NotFoundError = require('../utils/errors/NotFoundError');
+
+const { JWT_SECRET, NODE_ENV } = process.env;
 
 const getUserById = (req, res, next) => {
   let action;
@@ -62,9 +66,14 @@ const login = (req, res, next) => {
   const { password, email } = req.body;
   return userModel.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
-        expiresIn: JWT_EXPIRES,
-      });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : SECRET_KEY,
+
+        {
+          expiresIn: JWT_EXPIRES,
+        },
+      );
       res.send({ token });
     }).catch(next);
 };
